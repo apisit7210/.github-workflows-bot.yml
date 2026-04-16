@@ -20,7 +20,7 @@ Deploy   : Google Colab (free) with keep-alive
 """
 
 # ================== INSTALL ==================
-!pip install yfinance pandas ta scikit-learn matplotlib seaborn numpy scipy requests --quiet
+# !pip install yfinance pandas ta scikit-learn matplotlib seaborn numpy scipy requests --quiet
 print('✅ All packages installed')
 
 # ================== IMPORTS ==================
