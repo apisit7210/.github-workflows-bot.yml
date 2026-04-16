@@ -1,0 +1,27 @@
+name: AI Trading Bot
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # รันทุกชั่วโมง
+  workflow_dispatch:       # รัน manual ได้
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install yfinance pandas ta scikit-learn matplotlib numpy scipy
+
+      - name: Run bot
+        env:
+          TRADING_EMAIL: ${{ secrets.TRADING_EMAIL }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python bot.py
+
