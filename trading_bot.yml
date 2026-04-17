@@ -1,0 +1,75 @@
+name: 🤖 AI Trading Bot
+
+on:
+  schedule:
+    # รันทุก 30 นาที (GitHub Actions cron เป็น UTC)
+    - cron: "0,30 * * * *"
+
+  # รัน manual ได้จาก Actions tab
+  workflow_dispatch:
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25   # ป้องกัน job ค้าง
+
+    steps:
+      # ── 1. Checkout code ──────────────────────────────────────────
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Restore state files (trades, stats, cycle) ─────────────
+      - name: 📦 Restore bot state
+        uses: actions/cache@v4
+        with:
+          path: |
+            trades.json
+            stats.json
+            cycle.json
+          key: bot-state-${{ github.run_id }}
+          restore-keys: |
+            bot-state-
+
+      # ── 3. Setup Python ───────────────────────────────────────────
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      # ── 4. Install dependencies ───────────────────────────────────
+      - name: 📦 Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ── 5. Run bot ────────────────────────────────────────────────
+      - name: 🚀 Run Trading Bot
+        env:
+          TG_TOKEN:    ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID:  ${{ secrets.TG_CHAT_ID }}
+        run: python bot.py
+
+      # ── 6. Save state back to cache ───────────────────────────────
+      - name: 💾 Save bot state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            trades.json
+            stats.json
+            cycle.json
+          key: bot-state-${{ github.run_id }}
+
+      # ── 7. Upload state as artifact (backup, เก็บ 30 วัน) ─────────
+      - name: 📤 Upload state backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-state-${{ github.run_number }}
+          path: |
+            trades.json
+            stats.json
+            cycle.json
+          retention-days: 30
+          if-no-files-found: ignore
