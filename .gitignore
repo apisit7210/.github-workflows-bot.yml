@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+venv/
+.venv/
+
+# Sensitive data — ห้าม commit!
+.env
+secrets.txt
+*.key
+
+# Bot state (จะถูก manage โดย GitHub Actions cache)
+# uncomment ถ้าไม่อยากเก็บใน repo:
+# trades.json
+# stats.json
+# cycle.json
+
+# Charts
+*.png
+*.jpg
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
